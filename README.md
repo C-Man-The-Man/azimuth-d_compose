@@ -1,8 +1,12 @@
 # Azimuth Docker Compose
 
-The official Azimuth Docker image was recently released, but at the time of writing there was no complete Docker deployment guide.
+This repository originally started as a community Docker deployment while the official Azimuth Docker documentation was still under development.
 
-This repository provides a working `docker-compose.yml` using the **official Azimuth Docker image**. It does **not** modify or redistribute Azimuth itself.
+Since then, the Azimuth team has released their official Docker guide and kindly listed this repository as a community resource on the official website.
+
+This project now complements the official documentation with community-tested configurations, examples and deployment tips while continuing to use the **official Azimuth Docker image** without modifications.
+
+Official Docker documentation: https://azimuth.day/docs/docker
 
 ---
 
@@ -133,13 +137,15 @@ docker images
 
 Copy the `docker-compose.yml` from this repository.
 
-Edit the following values:
+The compose file intentionally stays close to the official release while adding additional explanations gathered from community testing.
 
-- `image`
-- `AZIMUTH_API_KEY`
-- `AZIMUTH_NODE_LAT`
-- `AZIMUTH_NODE_LON`
-- `AZIMUTH_NODE_ALT`
+Edit at least the following values before starting the container:
+
+- AZIMUTH_API_KEY
+- AZIMUTH_NODE_LAT
+- AZIMUTH_NODE_LON
+- AZIMUTH_NODE_ALT
+- AZIMUTH_NODE_LABEL (optional)
 
 If you are **not** using a USB GPS receiver, simply remove:
 
@@ -202,11 +208,35 @@ azimuth  | 2026-07-24T16:46:43.355041Z  INFO rtl_sdr_rs::tuners::r82xx: ni: 5, s
 
 ---
 
-# Known behavior
+# Observation modes
 
-As of **Azimuth v0.2.3**, the official daemon continuously samples **100 MHz every 30 seconds** while running the **Legacy observation loop**.
+## Legacy mode (default)
 
-This appears to be the current behavior of the official software and is **not caused by Docker**.
+As of **Azimuth v0.2.3**, the default Docker deployment continuously samples **100 MHz every 30 seconds** while running the **Legacy observation loop**.
+
+This is the intended behavior of the official daemon and is documented by the Azimuth team.
+
+## Multi-signal scanner
+
+The official daemon already contains the experimental multi-signal scanner capable of detecting:
+
+- FM + RDS
+- LTE
+- DTV
+
+The scanner is disabled by default.
+
+An example `config.toml` is included in this repository to make enabling the scanner easier.
+
+---
+
+# Scanner configuration
+
+This repository also includes an example `config.toml` that enables the built-in scanner mode.
+
+The scanner configuration is intended as a starting point for experimentation.
+
+LTE frequencies, television standards and RF allocations differ between countries, therefore you should adapt the configuration for your own region whenever possible.
 
 ---
 
@@ -249,6 +279,32 @@ Tested on:
 - u-blox USB GPS receiver
 - Azimuth Docker image v0.2.3
 
-Happy mining! 🚀
+Happy scanning!📡🚀
 
-For more detailed project breakdown, join my Finacial Freedom Discord server, we share and discuss new projects there https://discord.gg/wY3N2hCT3u.
+For more detailed project breakdown, join the **Finacial Freedom** Discord server, we share and discuss new projects there https://discord.gg/wY3N2hCT3u.
+
+---
+
+# Donations
+
+**Bitcoin wallet address**
+```text
+bc1qpcfex53u7mqx4dc25gw7j7446amw9vn6743cn5
+```
+
+**EVM / Metamask  (ETH, ETC, OCTA, POL, PEAQ, MONAD, BASE etc.)**
+```text
+0xbE4879888d95B02B2FCaed2FcAeBbcf36829BDC9
+```
+
+**Solana wallet address**
+```text
+7EHWvShXfjLJ2HhzTf4CsHgjKckivfMQMjnEoUAEqau
+```
+
+**Sui wallet address**
+```text
+0x421a5a462f99c2d675d035d0c741ba5765a47c1e28f95d33ad770cd34a36a6ea
+```
+
+**Thank you!**
