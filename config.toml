@@ -1,0 +1,94 @@
+#########################################################
+#
+# Azimuth Scanner Configuration
+#
+# This file enables the built-in multi-signal scanner.
+#
+# Place this file next to docker-compose.yml and
+# uncomment the bind mount inside docker-compose.yml.
+#
+#########################################################
+
+[scanning]
+
+#
+# config
+#     Uses only the frequencies listed below.
+#
+# sweep
+#     Automatically searches supported bands.
+#
+# both
+#     Uses both methods.
+#
+mode = "both"
+
+#
+# Scan interval (seconds)
+#
+interval_seconds = 30
+
+#
+# Scan weighting.
+#
+# Larger values allocate more scan time.
+#
+weight_fm = 1
+weight_lte = 3
+weight_dtv = 2
+
+retune_delay_ms = 100
+capture_retries = 3
+max_observations_per_cycle = 20
+
+#########################################################
+# FM
+#########################################################
+
+[scanning.fm]
+
+#
+# Leave empty to use automatic sweep.
+#
+frequencies = []
+
+sweep_start = 87500000
+sweep_end   = 108000000
+sweep_step  = 200000
+
+#########################################################
+# LTE
+#########################################################
+
+[scanning.lte]
+
+#
+# Example frequencies taken from the official
+# Azimuth documentation.
+#
+# LTE allocations vary by country.
+#
+frequencies = [
+    631000000,
+    637000000,
+    737000000,
+    881000000
+]
+
+#########################################################
+# DTV
+#########################################################
+
+[scanning.dtv]
+
+#
+# ATSC example configuration, specific for North-America.
+#
+# European users will typically need DVB-T/T2
+# frequencies instead.
+#
+frequencies = []
+
+sweep_start = 470000000
+sweep_end   = 608000000
+sweep_step  = 6000000
