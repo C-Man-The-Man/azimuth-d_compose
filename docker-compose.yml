@@ -1,6 +1,11 @@
 services:
   azimuth:
-    image: azimuth-node:0.2.3-arm64
+    #
+    # Both ARM64 and AMD64 releases load the same image tag.
+    #
+    # Normally this should remain unchanged.
+    #
+    image: azimuth-node:latest
 
     container_name: azimuth
 
@@ -110,6 +115,13 @@ services:
       # -1 = Automatic tuner gain
       #
       AZIMUTH_SDR_GAIN: "-1"
+      #
+      # Generated configuration location.
+      #
+      # Mount your own config.toml here to enable the
+      # experimental multi-signal scanner.
+      #
+      AZIMUTH_CONFIG_PATH: "/var/lib/azimuth/config.toml"
 
     #
     # Persistent node identity.
@@ -117,19 +129,24 @@ services:
     # Stores:
     #
     #   config.toml
-    #   node.id
+    #   node-identity.json
     #
     # Do NOT delete unless you intentionally want to
-    # re-register the node.
+    # register a new node.
     #
     volumes:
       - azimuth-data:/var/lib/azimuth
+      #
+      # Enable the experimental scanner by uncommenting:
+      #
+      #- ./config.toml:/var/lib/azimuth/config.toml
+      #
 
     #
     # Local health check
     #
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8420/status || exit 1"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8420/status"]
       interval: 30s
       timeout: 5s
       retries: 3
