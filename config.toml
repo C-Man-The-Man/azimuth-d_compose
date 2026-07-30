@@ -1,72 +1,99 @@
 #########################################################
 #
-# Azimuth Scanner Configuration
+# Azimuth Generic Scanner Configuration
 #
-# This file enables the built-in multi-signal scanner.
+# Repository:
+# https://github.com/C-Man-The-Man/azimuth-d_compose
 #
-# Place this file next to docker-compose.yml and
-# uncomment the bind mount inside docker-compose.yml.
+# Compatible with the current scanner implementation.
+#
+# This file is intended as a GENERIC scanner profile
+# suitable for most users worldwide.
+#
+# For region-specific scanner configurations, see:
+#
+# regional-scanner-configs/
+#
+#########################################################
+
+#########################################################
+#
+# Scanner Modes
+#
+# config
+#     Only scans the frequencies listed below.
+#
+# sweep
+#     Automatically scans the configured ranges.
+#
+# both
+#     Uses both methods.
 #
 #########################################################
 
 [scanning]
 
-#
-# config
-#     Uses only the frequencies listed below.
-#
-# sweep
-#     Automatically searches supported bands.
-#
-# both
-#     Uses both methods.
-#
 mode = "both"
 
 #
-# Scan interval (seconds)
+# Scanner interval (seconds)
 #
 interval_seconds = 30
 
 #
-# Scan weighting.
+# Scan weights.
 #
-# Larger values allocate more scan time.
+# Higher values allocate proportionally more scan time.
 #
 weight_fm = 1
 weight_lte = 3
 weight_dtv = 2
 
+#
+# Scanner behaviour.
+#
 retune_delay_ms = 100
 capture_retries = 3
 max_observations_per_cycle = 20
 
 #########################################################
-# FM
+#
+# FM Broadcast
+#
 #########################################################
 
 [scanning.fm]
 
 #
-# Leave empty to use automatic sweep.
+# Leave empty to automatically sweep the FM band.
 #
 frequencies = []
 
+#
+# Worldwide FM broadcast band.
+#
 sweep_start = 87500000
 sweep_end   = 108000000
 sweep_step  = 200000
 
 #########################################################
+#
 # LTE
+#
 #########################################################
 
 [scanning.lte]
 
 #
-# Example frequencies taken from the official
-# Azimuth documentation.
+# Generic LTE frequencies.
 #
-# LTE allocations vary by country.
+# These frequencies are based on the official Azimuth
+# example configuration and provide a reasonable
+# starting point.
+#
+# Region-specific scanner configurations may replace
+# these values with frequencies optimized for a
+# particular country.
 #
 frequencies = [
     631000000,
@@ -76,19 +103,24 @@ frequencies = [
 ]
 
 #########################################################
-# DTV
+#
+# Digital Television
+#
 #########################################################
 
 [scanning.dtv]
 
 #
-# ATSC example configuration, specific for North-America.
-#
-# European users will typically need DVB-T/T2
-# frequencies instead.
+# Leave empty to use automatic sweeping.
 #
 frequencies = []
 
+#
+# Generic television sweep.
+#
+# Individual countries may use different television
+# standards and channel allocations.
+#
 sweep_start = 470000000
 sweep_end   = 608000000
 sweep_step  = 6000000
