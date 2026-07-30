@@ -264,7 +264,4 @@ services:
 
 volumes:
   azimuth-data:
-
-volumes:
-  azimuth-data:
     name: azimuth-data
