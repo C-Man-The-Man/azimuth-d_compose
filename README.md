@@ -360,6 +360,14 @@ https://discord.gg/wY3N2hCT3u
 
 ---
 
+## Project History
+
+Interested in how this repository evolved?
+
+See **[HISTORY.md](HISTORY.md)** for the background, design decisions, and how the repository changed from Azimuth v0.2.3 to the current release.
+
+---
+
 # Donations
 
 **Bitcoin wallet address**
