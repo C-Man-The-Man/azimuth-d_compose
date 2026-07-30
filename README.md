@@ -37,6 +37,8 @@ Your API key is required before starting the node.
 
 ```
 .
+├── HISTORY.md
+├── LICENSE
 ├── README.md
 ├── docker-compose.arm64.yml
 └── docker-compose.amd64.yml
