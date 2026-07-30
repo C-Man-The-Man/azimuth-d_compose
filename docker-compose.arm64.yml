@@ -152,7 +152,7 @@ services:
       #
       # Antenna altitude in meters ABOVE MEAN SEA LEVEL (MSL).
       #
-      # This is NOT the height of the antenna above your roof or mast.
+      # This is NOT the height of the antenna above the ground topology.
       #
       AZIMUTH_NODE_ALT: "0"
 
