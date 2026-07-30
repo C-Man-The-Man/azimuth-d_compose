@@ -1,179 +1,269 @@
+# =============================================================================
+# Azimuth Tier 1 Node — Docker Compose (Community Edition)
+#
+# This Compose file intentionally follows the official Azimuth deployment.
+# Only the comments have been expanded to provide additional explanations for
+# Raspberry Pi users and Docker beginners.
+#
+# Official documentation:
+# https://azimuth.day/docs/docker
+#
+# =============================================================================
+
 services:
-  azimuth:
+  azimuth-node:
 
     #
-    # Official Azimuth Docker image (ARM64)
+    # Official Azimuth Docker image.
     #
-    # Raspberry Pi 4 / Raspberry Pi 5 or similar
+    # ARM64 version.
+    #
+    # If you are using an Intel/AMD computer, use docker-compose.amd64.yml instead.
     #
     image: azimuth-node:latest-arm64
 
-    container_name: azimuth
+    container_name: azimuth-node
 
     restart: unless-stopped
 
+    # -------------------------------------------------------------------------
+    # Hardware Access
+    # -------------------------------------------------------------------------
     #
-    # Hardware access
+    # Pass the host USB bus into the container so the RTL-SDR can be detected.
     #
-    # RTL-SDR Blog V3 / V4
+    # Remove this section if you intentionally want to run without hardware.
     #
     devices:
-      - /dev/bus/usb:/dev/bus/usb
+      - "/dev/bus/usb:/dev/bus/usb"
 
       #
-      # Optional USB GPS receiver
+      # Optional USB GPS receiver.
       #
-      # Uncomment ONLY if using a USB GPS device
-      # such as a u-blox receiver.
+      # Uncomment (delete the hashtag symbol #) and adjust the device path if using
+      # a GPS receiver such as a u-blox USB receiver.
       #
-      # Example:
+      # Example: /dev/ttyACM0:/dev/ttyACM0
       #
-      # - /dev/ttyACM0:/dev/ttyACM0
-      #
-      #- /dev/ttyACM0:/dev/ttyACM0
+      #- "/dev/ttyACM0:/dev/ttyACM0"
 
+    # -------------------------------------------------------------------------
+    # USB Permissions
+    # -------------------------------------------------------------------------
     #
-    # Numeric host group ID for plugdev.
+    # The container runs as the non-root user "azimuth".
     #
-    # Raspberry Pi OS usually uses:
+    # That user must belong to the same group that owns the USB device on the
+    # host system.
     #
-    #     46
+    # Raspberry Pi OS, Debian and Ubuntu usually use:
+    #
+    #     plugdev (gid 46)
     #
     # Verify yours with:
     #
     #     getent group plugdev
     #
+    # or:
+    #
+    #     ls -n /dev/bus/usb/001/
+    #
     group_add:
       - "46"
 
+    # -------------------------------------------------------------------------
+    # Configuration
+    # -------------------------------------------------------------------------
     #
-    # Local status endpoint.
+    # IMPORTANT
     #
-    # Available at:
+    # These environment variables are ONLY used during the FIRST startup.
     #
-    # http://127.0.0.1:8420/status
+    # On the first boot, the container generates:
     #
-    ports:
-      - "127.0.0.1:8420:8420"
-
+    #     /var/lib/azimuth/config.toml
+    #
+    # and stores it inside the persistent Docker volume.
+    #
+    # Future restarts reuse that configuration so your node keeps the same
+    # identity.
+    #
+    # To regenerate the configuration from these variables:
+    #
+    #     docker compose down -v
+    #     docker compose up -d
+    #
+    # WARNING:
+    #
+    # Removing the Docker volume also removes your node identity.
+    #
     environment:
 
-      #
-      # These variables are only used when generating
-      # the node configuration.
-      #
-      # If you intentionally want to regenerate the
-      # configuration:
-      #
-      # docker compose down
-      # docker volume rm azimuth-data
-      # docker compose up -d
-      #
+      # -----------------------------------------------------------------------
+      # Backend API
+      # -----------------------------------------------------------------------
 
       AZIMUTH_API_URL: "https://azimuth.day"
 
       #
-      # Create an API key from:
+      # REQUIRED
+      #
+      # Generate an API key from:
       #
       # https://azimuth.day/dashboard/settings
       #
-      AZIMUTH_API_KEY: "Insert_Your_API_Key"
+      AZIMUTH_API_KEY: "Paste_Your_API_Key"
+
+      # -----------------------------------------------------------------------
+      # Node Identity
+      # -----------------------------------------------------------------------
 
       #
-      # Friendly name shown in the Dashboard.
+      # Leave empty.
       #
-      # The "My Nodes" page currently assigns
-      # its own generated three-word node name.
+      # The node automatically registers itself during the first startup and 
+      # stores the assigned Node ID inside the Docker volume.
       #
-      AZIMUTH_NODE_LABEL: "Give_Your_Node_A_Name"
+      AZIMUTH_NODE_ID: ""
 
       #
-      # Station coordinates.
+      # Friendly node name shown in the Dashboard.
       #
-      # Latitude / Longitude in decimal degrees.
-      #
-      AZIMUTH_NODE_LAT: "0.000000"
-
-      AZIMUTH_NODE_LON: "0.000000"
+      AZIMUTH_NODE_LABEL: "my-azimuth-node"
 
       #
-      # Antenna altitude.
+      # Hardware type.
       #
-      # Meters ABOVE THE SEA LEVEL, not above the ground's topology.
+      # Normally this should not be changed.
+      #
+      AZIMUTH_HARDWARE_TYPE: "tier1_rtlsdr"
+
+      # -----------------------------------------------------------------------
+      # Node Location
+      # -----------------------------------------------------------------------
+
+      #
+      # Latitude and Longitude in decimal degrees.
+      #
+      AZIMUTH_NODE_LAT: "0.0000"
+
+      AZIMUTH_NODE_LON: "0.0000"
+
+      #
+      # Antenna altitude in meters ABOVE MEAN SEA LEVEL (MSL).
+      #
+      # This is NOT the height of the antenna above your roof or mast.
       #
       AZIMUTH_NODE_ALT: "0"
 
-      AZIMUTH_HARDWARE_TYPE: "tier1_rtlsdr"
+      # -----------------------------------------------------------------------
+      # Daemon Behaviour
+      # -----------------------------------------------------------------------
 
+      #
+      # Local status endpoint inside the container.
+      #
+      # Leave unchanged.
+      #
       AZIMUTH_STATUS_BIND: "0.0.0.0:8420"
 
       AZIMUTH_HEARTBEAT_SECS: "15"
 
       AZIMUTH_SUBMIT_SECS: "30"
 
+      # -----------------------------------------------------------------------
+      # RTL-SDR
+      # -----------------------------------------------------------------------
+
       #
-      # RTL-SDR defaults
+      # Standard RTL-SDR sample rate.
       #
       AZIMUTH_SDR_SAMPLE_RATE: "2048000"
 
       #
       # Automatic tuner gain.
       #
+      # -1 enables Automatic Gain Control (recommended).
+      #
       AZIMUTH_SDR_GAIN: "-1"
 
+      # -----------------------------------------------------------------------
+      # Region
+      # -----------------------------------------------------------------------
+
       #
-      # Configuration path.
+      # ISO 3166-1 alpha-2 country code.
+      #
+      # Examples:
+      #
+      # ES  Spain
+      # FR  France
+      # DE  Germany
+      # US  United States
+      # GB  United Kingdom
+      #
+      # AUTO selects the default worldwide frequency plan.
+      #
+      # Full list:
+      #
+      # https://azimuth.day/docs/regions
+      #
+      AZIMUTH_REGION: "AUTO"
+
+      # -----------------------------------------------------------------------
+      # Advanced Configuration
+      # -----------------------------------------------------------------------
+
+      #
+      # Path where the generated configuration is stored.
+      #
+      # Advanced users may replace this file with their own configuration after
+      # the first startup.
       #
       AZIMUTH_CONFIG_PATH: "/var/lib/azimuth/config.toml"
 
+    # -------------------------------------------------------------------------
+    # Local Status Endpoint
+    # -------------------------------------------------------------------------
     #
-    # Persistent data.
+    # Accessible only from the local machine:
+    #
+    # http://127.0.0.1:8420/status
+    #
+    # Do NOT expose this publicly unless protected by an authenticating reverse
+    # proxy.
+    #
+    ports:
+      - "127.0.0.1:8420:8420"
+
+    # -------------------------------------------------------------------------
+    # Persistent Data
+    # -------------------------------------------------------------------------
     #
     # Stores:
     #
-    #   • node identity
-    #   • configuration
+    # • config.toml
+    # • node-identity.json
     #
-    # Do NOT remove unless you intentionally want
-    # to register a brand new node.
+    # Do NOT remove unless you intentionally want to register a completely new
+    # node.
     #
     volumes:
-
-      #
-      # Persistent node data
-      #
       - azimuth-data:/var/lib/azimuth
 
-      #
-      # Scanner configuration.
-      #
-      # This repository provides:
-      #
-      # config.toml
-      #
-      # or regional scanner profiles such as:
-      #
-      # spain.toml
-      # europe-generic.toml
-      # usa-canada.toml
-      #
-      # Simply rename the desired regional profile
-      # to:
-      #
-      # config.toml
-      #
-      # before starting the container.
-      #
-      - ./config.toml:/var/lib/azimuth/config.toml
+    # -------------------------------------------------------------------------
+    # Health Check
+    # -------------------------------------------------------------------------
 
-    #
-    # Local health check
-    #
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8420/status"]
       interval: 30s
       timeout: 5s
+      start_period: 20s
       retries: 3
+
+volumes:
+  azimuth-data:
 
 volumes:
   azimuth-data:
