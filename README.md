@@ -39,9 +39,17 @@ The API key will be required when editing the Docker Compose file.
 │
 └── regional-scanner-configs/
     ├── SCANNER-README.md
-    ├── europe-generic.toml
-    └── usa-canada.toml
+    │
+    ├── europe/
+    │       ├── europe-generic.toml
+    │       ├── spain.toml
+    │       └── etc.
+    ├── north-america/
+    │       ├── usa-canada.toml
+    │       └── etc.
+    └── etc.
 ```
+The structure will be updated adding more regional `.toml` files.
 
 This repository intentionally separates:
 
