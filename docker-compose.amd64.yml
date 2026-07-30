@@ -3,7 +3,7 @@
 #
 # This Compose file intentionally follows the official Azimuth deployment.
 # Only the comments have been expanded to provide additional explanations for
-# Raspberry Pi users and Docker beginners.
+# Docker beginner users.
 #
 # Official documentation:
 # https://azimuth.day/docs/docker
@@ -40,14 +40,12 @@ services:
       #
       # Optional USB GPS receiver.
       #
-      # Uncomment and adjust the device path if using a GPS receiver such as
-      # a u-blox USB receiver.
+      # Uncomment (delete the hashtag symbol #) and adjust the device path if using
+      # a GPS receiver such as a u-blox USB receiver.
       #
-      # Example:
+      # Example: /dev/ttyACM0:/dev/ttyACM0
       #
-      # - "/dev/ttyACM0:/dev/ttyACM0"
-      #
-      # - "/dev/ttyACM0:/dev/ttyACM0"
+      #- "/dev/ttyACM0:/dev/ttyACM0"
 
     # -------------------------------------------------------------------------
     # USB Permissions
@@ -114,7 +112,7 @@ services:
       #
       # https://azimuth.day/dashboard/settings
       #
-      AZIMUTH_API_KEY: ""
+      AZIMUTH_API_KEY: "Paste_Your_API_Key"
 
       # -----------------------------------------------------------------------
       # Node Identity
@@ -147,16 +145,16 @@ services:
       #
       # Latitude and Longitude in decimal degrees.
       #
-      AZIMUTH_NODE_LAT: "0.0"
+      AZIMUTH_NODE_LAT: "0.0000"
 
-      AZIMUTH_NODE_LON: "0.0"
+      AZIMUTH_NODE_LON: "0.0000"
 
       #
       # Antenna altitude in meters ABOVE MEAN SEA LEVEL (MSL).
       #
-      # This is NOT the height of the antenna above your roof or mast.
+      # This is NOT the height of the antenna above the ground topology.
       #
-      AZIMUTH_NODE_ALT: "0.0"
+      AZIMUTH_NODE_ALT: "0"
 
       # -----------------------------------------------------------------------
       # Daemon Behaviour
