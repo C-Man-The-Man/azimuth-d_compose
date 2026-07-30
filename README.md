@@ -1,10 +1,15 @@
 # Azimuth Docker Compose Community Edition
 
-This repository originally started as a community Docker deployment while the official Azimuth Docker documentation was still under development.
+This repository provides a community-maintained Docker Compose deployment for the official **Azimuth Tier 1 SDR Node**.
 
-Since then, the Azimuth team has released their official Docker guide and kindly listed this repository as a community resource on the official website.
+Since the release of the official Docker image and documentation, this repository closely follows the upstream deployment while providing:
 
-Today, this repository focuses on providing community-tested Docker deployments, scanner configurations and regional scanner profiles while continuing to use the **official Azimuth Docker images** without modifications.
+- Raspberry Pi tested Docker Compose files
+- Separate ARM64 and AMD64 deployments
+- Additional installation and troubleshooting notes
+- Community support
+
+The Docker image itself is **not modified** and is always downloaded directly from the official Azimuth website.
 
 Official Docker documentation:
 
@@ -21,10 +26,10 @@ If this repository helped you get your node running, consider joining Azimuth us
 After registering:
 
 - Login to your Dashboard
-- Go to **Settings**
+- Open **Settings**
 - Generate a new **API Key**
 
-The API key will be required when editing the Docker Compose file.
+Your API key is required before starting the node.
 
 ---
 
@@ -34,30 +39,10 @@ The API key will be required when editing the Docker Compose file.
 .
 ├── README.md
 ├── docker-compose.arm64.yml
-├── docker-compose.amd64.yml
-├── config.toml
-│
-└── regional-scanner-configs/
-    ├── SCANNER-README.md
-    │
-    ├── europe/
-    │       ├── europe-generic.toml
-    │       ├── spain.toml
-    │       └── etc.
-    ├── north-america/
-    │       ├── usa-canada.toml
-    │       └── etc.
-    └── etc.
+└── docker-compose.amd64.yml
 ```
-The structure will be updated adding more regional `.toml` files.
 
-This repository intentionally separates:
-
-- Docker deployment
-- Generic scanner configuration
-- Region-specific scanner configurations
-
-making it easier to maintain and expand.
+Both Docker Compose files closely follow the official deployment while remaining easy to understand and modify.
 
 ---
 
@@ -65,20 +50,20 @@ making it easier to maintain and expand.
 
 - Docker Engine
 - Docker Compose
-- RTL-SDR Blog V3 / V4 (or compatible RTL2832U SDR)
+- RTL-SDR Blog V3 or V4 (RTL2832U compatible)
 - Raspberry Pi OS / Debian / Ubuntu
-- (Optional) USB GPS receiver
+- Optional USB GPS receiver
 
 ---
 
-# Install RTL-SDR
+# Install RTL-SDR Tools
 
 ```bash
 sudo apt update
 sudo apt install rtl-sdr
 ```
 
-Verify your SDR:
+Verify that your SDR is detected:
 
 ```bash
 rtl_test -t
@@ -90,13 +75,37 @@ Expected output:
 Found Rafael Micro R828D tuner
 ```
 
-If the SDR is not detected here, Docker will not be able to access it either.
+If your SDR is not detected here, Docker will not be able to access it either.
+
+Stop `rtl_test` before starting the container, since only one process can access the SDR at a time.
 
 ---
 
-# Optional: Install udev Rules
+# Blacklist the DVB Driver
 
-If your SDR already works correctly, this step can be skipped.
+Most Linux distributions automatically load the DVB television driver, preventing the RTL-SDR from being used.
+
+Blacklist it once:
+
+```bash
+echo "blacklist dvb_usb_rtl28xxu" | sudo tee /etc/modprobe.d/blacklist-rtlsdr.conf
+```
+
+Unload the driver immediately:
+
+```bash
+sudo modprobe -r dvb_usb_rtl28xxu
+```
+
+or simply reboot the system.
+
+---
+
+# Optional udev Rules
+
+Most Raspberry Pi installations work without this step.
+
+Only configure udev rules if your SDR has permission issues.
 
 Create:
 
@@ -120,14 +129,14 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="283c", MODE="0666
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a7", MODE="0666"
 ```
 
-Reload:
+Reload the rules:
 
 ```bash
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 ```
 
-Reconnect the SDR if necessary and verify again:
+Reconnect the SDR if necessary and verify it again:
 
 ```bash
 rtl_test -t
@@ -140,14 +149,15 @@ rtl_test -t
 Create a working directory:
 
 ```bash
-mkdir azimuth && cd azimuth
+mkdir azimuth
+cd azimuth
 ```
 
 ---
 
 # Download the Official Docker Image
 
-## Raspberry Pi 4 / Raspberry Pi 5 or similar (ARM64)
+## ARM64 (Raspberry Pi 4 / Raspberry Pi 5)
 
 ```bash
 curl -LO https://azimuth.day/downloads/azimuth-node-docker-arm64.tar.gz
@@ -185,23 +195,15 @@ Verify the image:
 docker images
 ```
 
----
+You should see:
 
-# Download the Generic Scanner Configuration
-
-Download the generic scanner configuration:
-
-```bash
-curl -LO https://raw.githubusercontent.com/C-Man-The-Man/azimuth-d_compose/main/config.toml
+```
+azimuth-node    latest
 ```
 
-This generic configuration works in most locations and serves as the default scanner profile.
-
-Regional scanner configurations are available inside the `regional-scanner-configs` directory.
-
 ---
 
-# Docker Compose
+# Configure Docker Compose
 
 Open the compose file:
 
@@ -209,46 +211,21 @@ Open the compose file:
 nano docker-compose.yml
 ```
 
-Edit:
+At minimum configure:
 
-- AZIMUTH_API_KEY
-- AZIMUTH_NODE_LABEL (optional)
-- AZIMUTH_NODE_LAT
-- AZIMUTH_NODE_LON
-- AZIMUTH_NODE_ALT
+- `AZIMUTH_API_KEY`
+- `AZIMUTH_NODE_LABEL`
+- `AZIMUTH_NODE_LAT`
+- `AZIMUTH_NODE_LON`
+- `AZIMUTH_NODE_ALT`
 
-Save and exit.
-
----
-
-# Regional Scanner Configurations
-
-The included `config.toml` is a generic scanner configuration.
-
-This repository also contains region-specific scanner configurations based on publicly available national spectrum allocation documentation.
-
-For example, to use the Spain scanner profile:
-
-```bash
-curl -LO https://raw.githubusercontent.com/C-Man-The-Man/azimuth-d_compose/main/regional-scanner-configs/spain.toml
-mv spain.toml config.toml
-```
-
-Likewise, any other regional profile can be used by replacing the filename in the download command.
-
-See:
+Optionally set your region:
 
 ```
-regional-scanner-configs/
+AZIMUTH_REGION=ES
 ```
 
-and
-
-```
-regional-scanner-configs/SCANNER-README.md
-```
-
-for additional information.
+Replace `ES` with your own ISO country code if necessary.
 
 ---
 
@@ -258,7 +235,7 @@ for additional information.
 docker compose up -d
 ```
 
-View the logs:
+Follow the logs:
 
 ```bash
 docker compose logs -f
@@ -266,54 +243,95 @@ docker compose logs -f
 
 ---
 
-# Notes
+# First Boot
 
-- Docker volumes preserve your node identity.
-- Replacing `config.toml` does **not** register a new node.
-- To regenerate the node configuration from the environment variables:
+During the first startup the container automatically generates:
 
-```bash
-docker compose down
-docker volume rm azimuth-data
-docker compose up -d
 ```
+/var/lib/azimuth/config.toml
+```
+
+using the `AZIMUTH_*` environment variables defined in the compose file.
+
+The generated configuration and node identity are stored inside the Docker volume.
+
+After the first startup, the environment variables are ignored and the stored configuration is reused.
 
 ---
 
-# Scanner Configurations
+# Regenerating the Configuration
 
-The scanner configuration included with this repository is intentionally generic.
+If you need to regenerate `config.toml` from the environment variables:
 
-Regional scanner configurations are maintained separately.
+```bash
+docker compose down -v
+docker compose up -d
+```
 
-Whenever possible, regional profiles are based on official spectrum allocation documentation published by each country's telecommunications authority instead of estimated or community-guessed frequencies.
+⚠️ **Warning**
 
-This ensures the repository remains technically accurate and easy to maintain.
+Removing the Docker volume also removes your node identity.
 
-Community contributions are welcome once verified on real hardware.
+Your node will register again as a new node.
+
+---
+
+# Updating the Node
+
+When a new Docker image is released:
+
+```bash
+docker load < azimuth-node-docker-xxxx.tar.gz
+docker compose up -d --force-recreate
+```
+
+Your configuration and node identity remain stored inside the Docker volume.
+
+---
+
+# Troubleshooting
+
+### SDR not detected
+
+Verify:
+
+```bash
+rtl_test -t
+```
+
+### USB permission issues
+
+Verify that the correct USB group is configured inside `docker-compose.yml`.
+
+### Container keeps restarting
+
+Inspect the logs:
+
+```bash
+docker compose logs -f
+```
+
+Most startup issues are caused by:
+
+- Missing API key
+- Incorrect SDR permissions
+- Invalid configuration
+- USB driver conflicts
 
 ---
 
 # Remove Everything
 
+Stop the node:
+
 ```bash
-docker compose down
+docker compose down -v
 ```
 
-```bash
-docker volume rm azimuth-data
-```
-
-ARM64
+Remove the Docker image:
 
 ```bash
-docker rmi azimuth-node:latest-arm64
-```
-
-AMD64
-
-```bash
-docker rmi azimuth-node:latest-amd64
+docker rmi azimuth-node:latest
 ```
 
 Remove the working directory:
@@ -336,7 +354,7 @@ rm -rf azimuth
 
 Happy scanning! 📡🚀
 
-For more technical discussions, Docker updates and new DePIN projects, join the **Financial Freedom** Discord community:
+For Docker discussions, DePIN projects and technical support, join the **Financial Freedom** Discord community:
 
 https://discord.gg/wY3N2hCT3u
 
@@ -364,4 +382,4 @@ bc1qpcfex53u7mqx4dc25gw7j7446amw9vn6743cn5
 0x421a5a462f99c2d675d035d0c741ba5765a47c1e28f95d33ad770cd34a36a6ea
 ```
 
-**Thank you!**
+**Thank you for your support! ❤️**
