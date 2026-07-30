@@ -6,6 +6,18 @@ Instead of relying on estimated or randomly selected frequencies, these profiles
 
 ---
 
+# Repository Philosophy
+
+This repository aims to provide practical, community-maintained scanner configurations for Azimuth.
+
+Profiles are created from publicly available spectrum allocation documentation whenever possible, then refined through community testing.
+
+Rather than maintaining daemon-version-specific scanner profiles, this repository maintains region-specific profiles that remain useful across Azimuth releases unless the scanner configuration format changes.
+
+This approach keeps maintenance simple while making it easier for the community to contribute new countries over time.
+
+---
+
 # Why Regional Profiles?
 
 Although many radio services occupy similar frequency ranges worldwide, there are important regional differences.
