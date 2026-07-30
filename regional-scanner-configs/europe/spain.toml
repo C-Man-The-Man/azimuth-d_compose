@@ -1,0 +1,106 @@
+##############################################################
+#
+# Azimuth Regional Scanner Profile
+#
+# Country:
+#     Spain
+#
+# Region:
+#     Europe
+#
+# Television Standard:
+#     DVB-T / DVB-T2
+#
+# FM Broadcast Band:
+#     87.5 MHz – 108 MHz
+#
+# Source Documentation:
+#     Cuadro Nacional de Atribución de Frecuencias (CNAF)
+#
+# Repository:
+#     https://github.com/C-Man-The-Man/azimuth-d_compose
+#
+# Maintainer:
+#     C-Man-The-Man
+#
+# Description:
+#     Scanner configuration optimized for Spain using
+#     publicly available national spectrum allocations.
+#
+# Installation:
+#
+#     mv spain.toml config.toml
+#
+# Restart afterwards:
+#
+#     docker compose restart
+#
+##############################################################
+
+[scanning]
+
+mode = "both"
+
+interval_seconds = 30
+
+weight_fm = 1
+weight_lte = 3
+weight_dtv = 2
+
+retune_delay_ms = 100
+capture_retries = 3
+max_observations_per_cycle = 20
+
+##############################################################
+# FM
+##############################################################
+
+[scanning.fm]
+
+frequencies = []
+
+sweep_start = 87500000
+sweep_end   = 108000000
+sweep_step  = 200000
+
+##############################################################
+# LTE
+##############################################################
+
+[scanning.lte]
+
+frequencies = [
+    718000000,
+    773000000,
+    806000000,
+    847000000,
+    902000000,
+    947000000,
+    1747000000,
+    1842000000,
+    1950000000,
+    2140000000,
+    2595000000
+]
+
+##############################################################
+# DVB-T / DVB-T2
+##############################################################
+
+[scanning.dtv]
+
+frequencies = []
+
+sweep_start = 470000000
+sweep_end   = 694000000
+sweep_step  = 8000000
+
+##############################################################
+#
+# End of configuration
+#
+# Looking for updates?
+#
+# https://github.com/C-Man-The-Man/azimuth-d_compose
+#
+##############################################################
