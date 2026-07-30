@@ -6,7 +6,7 @@ services:
     #
     # Raspberry Pi 4 / Raspberry Pi 5 or similar
     #
-    image: azimuth-node:0.2.5-amd64
+    image: azimuth-node:latest-amd64
 
     container_name: azimuth
 
