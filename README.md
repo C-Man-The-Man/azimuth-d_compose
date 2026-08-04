@@ -289,6 +289,32 @@ docker compose up -d --force-recreate
 
 Your configuration and node identity remain stored inside the Docker volume.
 
+## Known Issues
+
+If you download a new Docker image but the node still appears to be running an older version, verify the loaded image tags:
+
+```bash
+docker images
+```
+or inspect the version the latest tagged image
+
+```bash
+docker inspect azimuth-node:latest-arm64 | grep -i version
+```
+
+Some Azimuth releases have shipped with an incorrect `latest-arm64` tag. If this happens, either:
+
+- wait for the corrected image, or
+- temporarily change the image name in `docker-compose.arm64.yml` to the specific version tag (for example `azimuth-node:0.3.2-arm64`), or
+- change the tag locally and re-run the container (recommended)
+- 
+```bash
+docker tag azimuth-node:0.3.2-arm64 azimuth-node:latest-arm64
+docker compose down
+docker compuse up -d --force-recreate
+```
+(replace `azimuth-node:0.3.2-arm64` with the actual latest image version that is present on your system)
+
 ---
 
 # Troubleshooting
