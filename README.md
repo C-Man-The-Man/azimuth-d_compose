@@ -307,7 +307,7 @@ Some Azimuth releases have shipped with an incorrect `latest-arm64` tag. If this
 - wait for the corrected image, or
 - temporarily change the image name in `docker-compose.arm64.yml` to the specific version tag (for example `azimuth-node:0.3.2-arm64`), or
 - change the tag locally and re-run the container (recommended)
-- 
+
 ```bash
 docker tag azimuth-node:0.3.2-arm64 azimuth-node:latest-arm64
 docker compose down
