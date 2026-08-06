@@ -20,7 +20,12 @@ services:
     #
     # If you are using an Intel/AMD computer, use docker-compose.amd64.yml instead.
     #
-    image: azimuth-node:latest-arm64
+    # Old image tag
+    # azimuth-node:latest-arm64
+    # in case the new one stops working, replace the image name and
+    # use the tarball method
+    #
+    image: ghcr.io/azimuth-official/azimuth-node:latest
 
     container_name: azimuth-node
 
