@@ -20,7 +20,13 @@ services:
     #
     # If you are using a Raspberry Pi, use docker-compose.arm64.yml instead.
     #
-    image: azimuth-node:latest-amd64
+    # Old image tags
+    # azimuth-node:latest-amd64
+    # azimuth-node:latest-arm64
+    # in case the new one stops working, replace the image name and
+    # use the tarball methods
+    #
+    image: ghcr.io/azimuth-official/azimuth-node:latest
 
     container_name: azimuth-node
 
