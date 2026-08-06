@@ -159,7 +159,15 @@ cd azimuth
 
 # Download the Official Docker Image
 
-## ARM64 (Raspberry Pi 4 / Raspberry Pi 5)
+## The official Azimuth GitHub is finally open starting from the version 0.3.3 of the daemon
+
+```bash
+docker pull ghcr.io/azimuth-official/azimuth-node:latest
+```
+
+## The tarball methods
+
+### ARM64 (Raspberry Pi 4 / Raspberry Pi 5)
 
 ```bash
 curl -LO https://azimuth.day/downloads/azimuth-node-docker-arm64.tar.gz
@@ -175,7 +183,7 @@ mv docker-compose.arm64.yml docker-compose.yml
 
 ---
 
-## AMD64
+### AMD64 (Intel/AMD64 computers)
 
 ```bash
 curl -LO https://azimuth.day/downloads/azimuth-node-docker-amd64.tar.gz
